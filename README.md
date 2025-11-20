@@ -390,6 +390,41 @@ dotnet playwright install
 3. Push to branch: `git push origin feature/my-feature`
 4. Submit pull request
 
+### Git Commit Message Convention
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for clear and semantic commit messages.
+
+**Format:**
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Commit Types:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | A new feature | `feat(pages): add PersonalDetailsPage with form validation` |
+| `fix` | A bug fix | `fix(tests): resolve flaky login test timeout issue` |
+| `docs` | Documentation changes | `docs: add troubleshooting section to README` |
+| `style` | Code style changes - formatting, missing semicolons | `style: format code with C# conventions` |
+| `refactor` | Code refactoring without feature changes | `refactor(utils): consolidate wait helper methods` |
+| `perf` | Performance improvements | `perf(config): reduce default timeout from 30s to 15s` |
+| `test` | Adding or updating tests | `test(register): add test for duplicate email registration` |
+| `chore` | Build, dependencies, or tooling changes | `chore(deps): update Microsoft.Playwright to v1.48.0` |
+| `ci` | CI/CD configuration changes | `ci(workflows): add multi-browser test matrix` |
+
+**Tips:**
+- Keep subject line under 50 characters
+- Use imperative mood ("add" not "added")
+- Reference issues: `fixes #123` or `closes #456`
+- Provide context in the body for non-obvious changes
+
+...
+
 ## License
 
 See [LICENSE](LICENSE) file for details.
@@ -407,6 +442,6 @@ For issues, questions, or contributions, please open an issue in the repository.
 
 ---
 
-**Last Updated:** November 2024
+**Last Updated:** November 2025
 **Framework Version:** 1.0.0
 **Target Framework:** .NET 8.0
