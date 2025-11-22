@@ -1,8 +1,10 @@
 ﻿{
   "Environment": "QA",
-  "Browser": "chrome",
+  "Browser": "chromium",
+   "Notes" : "Valid values for Browser: chromium, firefox, webkit" ,
   "BaseUrl": "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
   "UserName": "Admin",
-  "Password": "admin123"
+  "Password": "admin123",
+  "Headless": false
 }
 

@@ -22,7 +22,7 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
         // TestProfile configuration loaded from JSON
         protected static readonly TestProfile Config = ConfigReader.Load();
         private string environment = Config.Environment!;
-        private string browser = Config.Browser!.ToUpper();
+        private string browser = Config.Browser!.ToLower();
 
         protected string baseUrl = Config.BaseUrl!;
         protected string userName = Config.UserName!;
@@ -50,12 +50,35 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
         [OneTimeSetUp]
         public void GlobalSetup()
         {
+            // Set BROWSER environment variable to specify which browser to use
+            // This must be set BEFORE browser initialization
+            Environment.SetEnvironmentVariable("BROWSER", browser);
+            
+            // Set HEADED environment variable based on config
+            bool isHeaded = !(Config.Headless ?? true);
+            if (isHeaded)
+            {
+                Environment.SetEnvironmentVariable("HEADED", "1");
+                Console.WriteLine($"[GlobalSetup] Setting HEADED=1 (headed mode enabled)");
+            }
+
+            Console.WriteLine($"[GlobalSetup] Setting BROWSER={browser}");
+            Console.WriteLine($"[OneTimeSetUp] ========== TEST EXECUTION STARTED ==========");
+            Console.WriteLine($"[OneTimeSetUp] Environment: {environment}");
+            Console.WriteLine($"[OneTimeSetUp] Base URL: {baseUrl}");
+            Console.WriteLine($"[OneTimeSetUp] Browser: {browser.ToUpper()}");
+            Console.WriteLine($"[OneTimeSetUp] Headless: {Config.Headless}");
+            Console.WriteLine($"[OneTimeSetUp] Mode: {(isHeaded ? "HEADED" : "HEADLESS")}");
+            Console.WriteLine($"[OneTimeSetUp] =========================================");
+
             // Get shared instance of ExtentReports
-            extent = ExtentReportManager.GetInstance(browser, environment);
+            extent = ExtentReportManager.GetInstance(browser.ToUpper(), environment);
 
             TestContext.WriteLine($"[OneTimeSetUp] Environment: {environment}");
             TestContext.WriteLine($"[OneTimeSetUp] Base URL: {baseUrl}");
-            TestContext.WriteLine($"[OneTimeSetUp] Browser: {browser}");
+            TestContext.WriteLine($"[OneTimeSetUp] Browser: {browser.ToUpper()}");
+            TestContext.WriteLine($"[OneTimeSetUp] Headless Config: {Config.Headless}");
+            TestContext.WriteLine($"[OneTimeSetUp] Mode: {(isHeaded ? "HEADED" : "HEADLESS")}");
 
             var testDataReader = TestDataReader.Load();
             pd = testDataReader.pd;
@@ -68,19 +91,16 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
         public async Task Setup()
         {
             // Create a test node in ExtentReports for each test
-            // Give full name in report: "C_Sharp_Selenium_NUnit.Tests.LoginTest.Login"
             test = extent?.CreateTest(TestContext.CurrentContext.Test.FullName);
 
+            bool isHeaded = !(Config.Headless ?? true);
             // Log to both console and ExtentReports
             Log($"Test started: {TestContext.CurrentContext.Test.Name}");
-            test?.Info($"Browser {browser} initialized");
+            test?.Info($"Browser {browser.ToUpper()} initialized - Mode: {(isHeaded ? "HEADED" : "HEADLESS")}");
             
-            // Browser context and page are automatically initialized by PageTest
-            // Page is available as the 'Page' property inherited from PageTest
-            
-            // Optional: Set viewport size
-            await Page.SetViewportSizeAsync(1920, 1080);
-            Log($"Browser window set to 1920x1080");
+            // Set viewport size
+            // await Page.SetViewportSizeAsync(1920, 1080);
+            // Log($"Browser window set to 1920x1080");
         }
 
         /// <summary>
@@ -117,11 +137,9 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
                         string screenshotFile = $"{testMethodName}_{timestamp}.png";
                         string screenshotPath = Path.Combine(screenshotDir, screenshotFile);
 
-                        // Take screenshot with Playwright
                         await Page.ScreenshotAsync(new() { Path = screenshotPath });
                         Log($"Screenshot saved to: {screenshotPath}");
 
-                        // Use relative path for Extent report so it works in GitHub Pages
                         string relativePath = Path.Combine("Screenshots", screenshotFile).Replace("\\", "/");
                         test?.AddScreenCaptureFromPath(relativePath);
                     }
@@ -138,9 +156,6 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
             }
 
             Log($"Test finished: {testMethodName} with status {testOutcome}");
-
-            // PageTest automatically closes the browser context and page
-            // No need to manually close the browser
         }
 
         /// <summary>
@@ -151,6 +166,7 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
         {
             ExtentReportManager.Flush();
             Log("ExtentReports flushed");
+            Console.WriteLine($"[OneTimeTearDown] ========== TEST EXECUTION COMPLETED ==========");
         }
 
         /// <summary>
@@ -159,6 +175,7 @@ namespace C_Sharp_Selenium_NUnit.BaseClass
         protected void Log(string message)
         {
             Console.WriteLine($"[Playwright] {DateTime.Now:HH:mm:ss} - {message}");
+            TestContext.WriteLine($"[Playwright] {DateTime.Now:HH:mm:ss} - {message}");
         }
     }
 }

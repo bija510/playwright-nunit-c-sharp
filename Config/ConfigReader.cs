@@ -20,6 +20,8 @@ namespace C_Sharp_Selenium_NUnit.Config
             if (profile == null)
                 throw new Exception("Failed to load test settings.");
 
+            Console.WriteLine($"[ConfigReader] Loaded Browser: {profile.Browser}, Headless: {profile.Headless}");
+
             return profile;
         }
     }
@@ -31,5 +33,6 @@ namespace C_Sharp_Selenium_NUnit.Config
         public string? BaseUrl { get; set; }
         public string? UserName { get; set; }
         public string? Password { get; set; }
+        public bool? Headless { get; set; }
     }
 }
