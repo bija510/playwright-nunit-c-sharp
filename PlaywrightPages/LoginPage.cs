@@ -13,7 +13,7 @@ namespace C_Sharp_Selenium_NUnit.PlaywrightPages
         /// <summary>
         /// Locator for username input field
         /// </summary>
-        private ILocator UserNameTxt => _page.Locator("//input[@placeholder='Username']");
+        private ILocator UserNameTxt => _page.Locator("//input[@placeholder='Usern']");
 
         /// <summary>
         /// Locator for password input field
